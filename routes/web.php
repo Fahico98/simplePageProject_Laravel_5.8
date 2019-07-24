@@ -1,5 +1,7 @@
 <?php
 
+use App\Product;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -50,12 +52,79 @@ Route::get('user/{userId}', "PagesController@profilePage")->where("userId", "[0-
 Route::get('user/{userId}/{userName}', "PagesController@profilePage")->where(["userId" => "[0-9]+", "userName" => "[a-zA-Z]+",]);
 
 /**
+ * RAW SQL.
+ *
+ * it’s possible to make any raw call to the database using the DB facade and the statement() method:
+ * DB::statement('SQL statement here').
+ */
+Route::get("/insertLaptop", function(){ // Insert statement...
+   DB::insert(
+      "INSERT INTO product (
+         name,
+         price,
+         country_origin,
+         section,
+         remarks
+      ) values (?, ?, ?, ?, ?)",
+      [
+         "Laptop",
+         600.0,
+         "South Corea",
+         "Technology",
+         "none"
+      ]
+   );
+   // $usersOfType = DB::select("SELECT * FROM product WHERE name = ?", ["Fahico"]);
+   // $countUpdated = DB::update("UPDATE product SET section = ? WHERE name = ?", ["computers", "Laptop"]);
+   // $countDeleted = DB::delete("DELETE FROM product WHERE id = ?', [1]);
+});
+
+/**
+ * ELOQUENT.
+ *
+ * Laravel 5 promotes the use of namespaces for things like Models and Controllers. "Product" Model is
+ * under the App namespace thus "use App\Product" is required...
+ */
+Route::get("/productModelTest", function(){
+
+   $products = Product::all();
+
+   echo("<h2>All items in 'product' table...</h2>");
+   foreach($products as $product){
+      echo(
+         "<h4>
+            Name: $product->name,&emsp;
+            Price: $product->price,&emsp;
+            Country origin: $product->country_origin,&emsp;
+            Section: $product->section,&emsp;
+            Remarks: $product->remarks
+         </h4>"
+      );
+   }
+
+   $products = Product::where("country_origin", "Unite States")->get();
+
+   echo("</br><h2>American items in 'product' table...</h2>");
+   foreach($products as $product){
+      echo(
+         "<h4>
+            Name: $product->name,&emsp;
+            Price: $product->price,&emsp;
+            Country origin: $product->country_origin,&emsp;
+            Section: $product->section,&emsp;
+            Remarks: $product->remarks
+         </h4>"
+      );
+   }
+});
+
+/**
  *
  * ************************************************* NOTES *************************************************
  *
  * TYPE-HINTED: variable type setting in function argument, for example.
  *
- * ---------------------------------------------------------------------------------------------------------
+ * |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
  *
  * ROUTE MODEL BINDING.
  *
@@ -94,7 +163,7 @@ Route::get('user/{userId}/{userName}', "PagesController@profilePage")->where(["u
  *    return view('events.show')->with('event', $event);
  * });
  *
- * ---------------------------------------------------------------------------------------------------------
+ * |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
  *
  * CUSTOM BLADE DIRECTIVES.
  *
@@ -134,6 +203,80 @@ Route::get('user/{userId}/{userName}', "PagesController@profilePage")->where(["u
  * sea que esté dentro de los parentesis). As you can see, we then generate a valid PHP code snippet and
  * return it.
  *
+ * |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
  *
+ * CHAINING WITH QUERY BUILDER.
+ *
+ * The query builder makes it possible to chain methods together to, you guessed it, build a query. At
+ * the end of your chain you’ll use some method—likely get()—to trigger the actual execution of the query
+ * you’ve just built.
+ *
+ * $usersOfType = DB::table('users')->where('type', $type)->get();
+ *
+ * $emails = DB::table('contacts')->select('email', 'email2 as second_email')->get();
+ *
+ * or
+ *
+ * $emails = DB::table('contacts')->select('email')->addSelect('email2 as second_email')->get();
+ *
+ * -> where(): allows you to limit the scope of what’s being returned using WHERE. By default, the signature
+ * of the where() method is that it takes three parameters—the column, the comparison operator, and the
+ * value:
+ *
+ * $newContacts = DB::table('contact')->where('age', '>', 18)->get();
+ *
+ * However, if your comparison is "=", which is the most common comparison, you can drop the second
+ * operator:
+ *
+ * $vipContacts = DB::table('contacts')>where('vip',true)->get();
+ *
+ * If you want to combine where() statements, you can either chain them after each other, or pass an
+ * array of arrays:
+ *
+ * $newVips = DB::table('contacts')->where('vip', true)->where('age', '>', 18);
+ *
+ * or
+ *
+ * $newVips = DB::table('contacts')->where(
+ *    [
+ *       ['vip', true],
+ *       ['age', '>', 18]
+ *    ]
+ * );
+ *
+ * -> orWhere() Creates simple OR WHERE statements:
+ *
+ * $priorityContacts = DB::table('contacts')->where('vip', true)->orWhere('age', '>', 18)->get();
+ *
+ * To create a more complex OR WHERE statement with multiple conditions, pass orWhere() a closure:
+ *
+ * $contacts = DB::table('contacts')->where('vip', true)->orWhere(function($query){
+ *    $query->where('age', '>', 18)->where('trial', false);
+ * })->get();
+ *
+ * ...
+ *
+ * |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ *
+ * TRANSACTIONS.
+ *
+ * If you’re not familiar with database transactions, they’re a tool that allows you to wrap up a series
+ * of database queries to be performed in a batch, which you can choose to roll back, undoing the entire
+ * series of queries. Transactions are often used to ensure that all or none, but not some, of a series of
+ * related queries are performed—if one fails, the ORM will roll back the entire series of queries.
+ *
+ * With the Laravel query builder’s transaction feature, if any exceptions are thrown at any point within
+ * the transaction closure, all the queries in the transaction will be rolled back. If the transaction
+ * closure finishes successfully, all the queries will be committed and not rolled back.
+ *
+ * // (use): https://www.php.net/manual/es/functions.anonymous.php
+ * DB::transaction(function () use ($userId, $numVotes) {
+ *
+ *    // Possibly failing DB query.
+ *    DB::table('users')->where('id', $userId)->update(['votes' => $numVotes]);
+ *
+ *    // Caching query that we don't want to run if the above query fails.
+ *    DB::table('votes')->where('user_id', $userId)->delete();
+ * });
  *
  */
