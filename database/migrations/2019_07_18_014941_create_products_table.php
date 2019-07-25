@@ -55,8 +55,9 @@ class CreateProductsTable extends Migration{
     * @return void
     */
    public function up(){
-      Schema::create('product', function (Blueprint $table) {
+      Schema::create('products', function (Blueprint $table) {
          $table->bigIncrements('id');
+         $table->bigInteger("costumer_id");
          $table->string("name", 100);
          $table->double("price", 8, 2);
          $table->string("country_origin", 100);
@@ -71,6 +72,6 @@ class CreateProductsTable extends Migration{
     * @return void
     */
    public function down(){
-      Schema::dropIfExists('product');
+      Schema::dropIfExists('products');
    }
 }

@@ -24,4 +24,8 @@ class PagesController extends Controller{
    public function profilePage($userId = 0, $userName = ""){
       return view("profile")->with(["userId" => $userId, "userName" => $userName]);
    }
+
+   public function showProductsCostumer($costumerId = 0){
+      //
+   }
 }

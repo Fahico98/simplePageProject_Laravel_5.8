@@ -1,6 +1,7 @@
 <?php
 
 use App\Product;
+use App\Costumer;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,6 +117,66 @@ Route::get("/productModelTest", function(){
          </h4>"
       );
    }
+});
+
+Route::get("/updateUnitedStatesRemarks", function(){
+   Product::where("country_origin", "Unite States")->update(
+      ["remarks" => "This product has an additional %2.5 tax"]
+   );
+   echo("<h3>Updates it's done...!</h3>");
+});
+
+Route::get("deleteGlobes", function(){
+   Product::where("name", "Globes")->delete();
+   echo("<h3>Globes deleted successfully...!</h3>");
+});
+
+/**
+ * MASS ASSIGNMENT.
+ *
+ * You may also use the "create" method to save a new model in a single line. The inserted model instance
+ * will be returned to you from the method. However, before doing so, you will need to specify either a
+ * "fillable" or "guarded" attribute on the model, as all Eloquent models protect against mass-assignment
+ * by default.
+ *
+ * A mass-assignment vulnerability occurs when a user passes an unexpected HTTP parameter through a
+ * request, and that parameter changes a column in your database you did not expect. For example, a
+ * malicious user might send an "is_admin" parameter through an HTTP request, which is then passed into
+ * your model's "create" method, allowing the user to escalate themselves to an administrator.
+ *
+ * So, to get started, you should define which model attributes you want to make mass assignable. You may
+ * do this using the $fillable property on the model. For example:
+ *
+ * namespace App\Flight;
+ * use Illuminate\Database\Eloquent\Model;
+ * class Flight extends Model{
+ *    protected $fillable = ['name'];
+ * }
+ *
+ * Once we have made the attributes mass assignable, we can use the "create" method to insert a new
+ * record in the database. The "create" method returns the saved model instance:
+ *
+ * $flight = Flight::create(['name' => 'Flight 10']);
+ *
+ * If you already have a model instance, you may use the "fill" method to populate it with an array of
+ * attributes:
+ *
+ * $flight->fill(['name' => 'Flight 22']);
+ */
+Route::get("/insertMultiple", function(){
+   Product::create(
+      [
+         "name" => "pen",
+         "price" => 10.0,
+         "country_origin" => "Italy",
+         "section" => "Stationery",
+         "remarks" => "none"
+      ]
+   );
+});
+
+Route::get("/relationshipTest/{costumerId}", "PagesController@showProductsCostumer")->where("costumerId", "[0-9]+");
+
 });
 
 /**

@@ -68,7 +68,7 @@ class AddSectionToProductsTable extends Migration{
     * @return void
     */
    public function up(){
-      Schema::table('product', function (Blueprint $table) {
+      Schema::table('products', function (Blueprint $table) {
          $table->string("section")->after("country_origin");
       });
    }
@@ -79,7 +79,7 @@ class AddSectionToProductsTable extends Migration{
     * @return void
     */
    public function down(){
-      Schema::table('product', function (Blueprint $table) {
+      Schema::table('products', function (Blueprint $table) {
          $table->dropColumn('section');
       });
    }
