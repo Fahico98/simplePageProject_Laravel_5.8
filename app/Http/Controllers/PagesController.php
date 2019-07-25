@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App;
 
 class PagesController extends Controller{
 
@@ -26,6 +27,23 @@ class PagesController extends Controller{
    }
 
    public function showProductsCostumer($costumerId = 0){
-      //
+      if($costumerId == 0){
+         echo("<h2>The costumer don't have products...!</h2>");
+      }else{
+         $products = Product::where("costumer_id", $costumerId)->get();
+         $costumer = Costumer::find($costumerId);
+         echo("<h2>Products of $costumer->name $costumer->lastname:</h2>");
+         foreach($products as $product){
+            echo(
+               "<h4>
+                  Name: $product->name,&emsp;
+                  Price: $product->price,&emsp;
+                  Country origin: $product->country_origin,&emsp;
+                  Section: $product->section,&emsp;
+                  Remarks: $product->remarks
+               </h4>"
+            );
+         }
+      }
    }
 }

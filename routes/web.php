@@ -1,7 +1,6 @@
 <?php
 
-use App\Product;
-use App\Costumer;
+use App;
 
 /*
 |--------------------------------------------------------------------------
@@ -176,8 +175,6 @@ Route::get("/insertMultiple", function(){
 });
 
 Route::get("/relationshipTest/{costumerId}", "PagesController@showProductsCostumer")->where("costumerId", "[0-9]+");
-
-});
 
 /**
  *
